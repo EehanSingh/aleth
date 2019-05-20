@@ -11,7 +11,6 @@
 #define BOOST_TEST_MODULE EthereumTests
 #define BOOST_TEST_NO_MAIN
 
-#include <AllTestNames.h>
 #include <test/tools/jsontests/BlockChainTests.h>
 #include <test/tools/jsontests/StateTests.h>
 #include <test/tools/jsontests/TransactionTests.h>
@@ -162,20 +161,8 @@ int main(int argc, const char* argv[])
 
 void printTestSuiteSuggestions(string const& _sMinusTArg)
 {
-    size_t allTestsElementIndex = 0;
-    // <index in availableTests, compared distance>
-    typedef std::pair<size_t, size_t> NameDistance;
-    // Use `vector` here because `set` does not work with sort
-    std::vector<NameDistance> distanceMap;
-    for (auto& it : c_allTestNames)
-    {
-        int const dist =
-            test::levenshteinDistance(_sMinusTArg.c_str(), _sMinusTArg.size(), it, strlen(it));
-        distanceMap.emplace_back(allTestsElementIndex++, dist);
-    }
-    std::sort(distanceMap.begin(), distanceMap.end(),
-        [](NameDistance const& _a, NameDistance const& _b) { return _a.second < _b.second; });
+    auto testList = test::testSuggestions(_sMinusTArg);
     std::cerr << "Did you mean: \n";
-    for (size_t i = 0; i < 3 && i < distanceMap.size(); i++)
-        std::cerr << "-t " << c_allTestNames[distanceMap[i].first] << "\n";
+    for (auto const& element : testList)
+        std::cerr << "-t " << element << "\n";
 }

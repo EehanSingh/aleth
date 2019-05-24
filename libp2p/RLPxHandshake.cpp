@@ -32,20 +32,22 @@ RLPXHandshake::RLPXHandshake(
     m_socket(_socket),
     m_idleTimer(m_socket->ref().get_io_service())
 {
+    auto const prefixAttr = boost::log::attributes::constant<std::string>{ connectionDirectionString() };
     m_logger.add_attribute(
-        "Prefix", boost::log::attributes::constant<std::string>(connectionDirectionString()));
+        "Prefix", prefixAttr);
     m_errorLogger.add_attribute(
-        "Prefix", boost::log::attributes::constant<std::string>(connectionDirectionString()));
+        "Prefix", prefixAttr);
 
     stringstream remoteInfoStream;
     remoteInfoStream << "(" << _remote;
     if (remoteSocketConnected())
         remoteInfoStream << "@" << m_socket->remoteEndpoint();
     remoteInfoStream << ")";
+    auto const suffixAttr = boost::log::attributes::constant<std::string>{ remoteInfoStream.str() };
     m_logger.add_attribute(
-        "Suffix", boost::log::attributes::constant<std::string>(remoteInfoStream.str()));
+        "Suffix", suffixAttr);
     m_errorLogger.add_attribute(
-        "Suffix", boost::log::attributes::constant<std::string>(remoteInfoStream.str()));
+        "Suffix", suffixAttr);
 
     crypto::Nonce::get().ref().copyTo(m_nonce.ref());
 }
